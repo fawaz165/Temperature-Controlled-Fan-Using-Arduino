@@ -1,0 +1,93 @@
+#include "DHT.h"
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+
+#define DHTPIN 12     // Pin for DHT sensor
+#define DHTTYPE DHT11 // Type of DHT sensor
+#define PWM_PIN 9     // Pin for PWM control
+
+byte degree[8] = 
+{
+    0b00011,
+    0b00011,
+    0b00000,
+    0b00000,
+    0b00000,
+    0b00000,
+    0b00000,
+    0b00000
+};
+
+DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor
+
+void setup() {
+    lcd.begin(16, 2);
+    lcd.createChar(1, degree);
+    lcd.clear();
+    lcd.print("   Fan Speed  ");
+    lcd.setCursor(0, 1);
+    lcd.print("  Controlling ");
+    delay(2000);
+    analogWrite(PWM_PIN, 255);
+    lcd.clear();
+    lcd.print("Robu ");
+    delay(2000);
+    Serial.begin(9600);
+    dht.begin();
+}
+
+void loop() {
+    delay(2000);
+
+    float humidity = dht.readHumidity();
+    float tempC = dht.readTemperature();
+    float tempF = dht.readTemperature(true);
+
+    if (isnan(humidity) || isnan(tempC) || isnan(tempF)) {
+        Serial.println("Failed to read from DHT sensor!");
+        return;
+    }
+
+    float heatIndex = dht.computeHeatIndex(tempF, humidity);
+
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.print(" %\t");
+    Serial.print("Temperature: ");
+    Serial.print(tempC);
+    Serial.print(" *C ");
+    Serial.print(tempF);
+    Serial.print(" *F\t");
+    Serial.print("Heat Index: ");
+    Serial.print(heatIndex);
+    Serial.println(" *F");
+
+    lcd.setCursor(0, 0);
+    lcd.print("Temp: ");
+    lcd.print(tempC);
+    lcd.print(" C");
+    lcd.setCursor(0, 1);
+
+    if (tempC < 20) {
+        analogWrite(PWM_PIN, 0);
+        lcd.print("Fan OFF            ");
+    } else if (tempC == 20) {
+        analogWrite(PWM_PIN, 102);
+        lcd.print("Fan Speed: 40%    ");
+    } else if (tempC == 26) {
+        analogWrite(PWM_PIN, 51);
+        lcd.print("Fan Speed: 20%    ");
+    } else if (tempC == 28) {
+        analogWrite(PWM_PIN, 153);
+        lcd.print("Fan Speed: 60%    ");
+    } else if (tempC > 25) {
+        analogWrite(PWM_PIN, 204);
+        lcd.print("Fan Speed: 10%    ");
+    } else if (tempC < 30) {
+        analogWrite(PWM_PIN, 51);
+        lcd.print("Fan Speed: 5%    ");
+    }
+    
+    delay(3000);
+}
