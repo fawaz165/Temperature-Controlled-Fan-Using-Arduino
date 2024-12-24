@@ -31,7 +31,6 @@ The **Temperature Controlled Fan Using Arduino** project showcases the applicati
 
 ---
 
-
 ##  Components Used
 
 ### Hardware
@@ -93,17 +92,17 @@ The **Temperature Controlled Fan Using Arduino** project showcases the applicati
 
 ##  Code Snippet
 
-#include "DHT.h"
-#include <LiquidCrystal.h>
+    #include "DHT.h"
+    #include <LiquidCrystal.h>
 
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+    LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
-#define DHTPIN 12     // Pin for DHT sensor
-#define DHTTYPE DHT11 // Type of DHT sensor
-#define PWM_PIN 9     // Pin for PWM control
+    #define DHTPIN 12     // Pin for DHT sensor
+    #define DHTTYPE DHT11 // Type of DHT sensor
+    #define PWM_PIN 9     // Pin for PWM control
 
-byte degree[8] = 
-{
+    byte degree[8] = 
+    {
     0b00011,
     0b00011,
     0b00000,
@@ -112,11 +111,11 @@ byte degree[8] =
     0b00000,
     0b00000,
     0b00000
-};
+    };
 
-DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor
+    DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor
 
-void setup() {
+    void setup() {
     lcd.begin(16, 2);
     lcd.createChar(1, degree);
     lcd.clear();
@@ -130,9 +129,9 @@ void setup() {
     delay(2000);
     Serial.begin(9600);
     dht.begin();
-}
+    }
 
-void loop() {
+    void loop() {
     delay(2000);
 
     float humidity = dht.readHumidity();
